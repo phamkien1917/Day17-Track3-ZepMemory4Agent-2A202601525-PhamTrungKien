@@ -48,19 +48,119 @@ LAYER_COLORS = {
 
 CSS = """
 <style>
-.block-container { padding-top: 2rem; max-width: 1200px; }
-.lab-badge {
-    display:inline-block; padding:2px 10px; border-radius:999px;
-    color:#fff; font-size:0.75rem; font-weight:600; letter-spacing:.02em;
-    margin-right:6px;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+html, body, [class*="css"] {
+    font-family: 'Inter', sans-serif;
 }
+
+/* App Background & Sidebar */
+[data-testid="stAppViewContainer"] {
+    background: radial-gradient(circle at 15% 50%, #151520, #0a0a0f);
+    color: #e2e8f0;
+}
+[data-testid="stSidebar"] {
+    background: rgba(15, 15, 20, 0.7) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Typography */
+h1 {
+    font-weight: 700 !important;
+    background: -webkit-linear-gradient(45deg, #3b82f6, #8b5cf6, #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.02em;
+    padding-bottom: 0.5rem;
+}
+
+/* Glassmorphism Cards */
 .lab-card {
-    border:1px solid rgba(128,128,128,.25); border-radius:12px;
-    padding:14px 16px; margin-bottom:12px; background:rgba(127,127,127,.06);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease;
 }
-.lab-kv { font-size:0.85rem; opacity:.85; }
-.lab-kv b { opacity:1; }
-.stChatMessage { border-radius:12px; }
+.lab-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
+    border-color: rgba(139, 92, 246, 0.5);
+}
+
+.lab-badge {
+    display: inline-block; 
+    padding: 4px 12px; 
+    border-radius: 999px;
+    color: #fff; 
+    font-size: 0.75rem; 
+    font-weight: 600; 
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    margin-right: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.lab-kv { font-size:0.9rem; opacity:.85; line-height: 1.5; }
+.lab-kv b { opacity:1; color: #f8fafc; }
+
+/* Metrics */
+[data-testid="stMetricValue"] {
+    font-weight: 600 !important;
+    font-size: 2rem !important;
+    color: #f8fafc !important;
+}
+[data-testid="stMetricLabel"] {
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.75rem !important;
+    color: #94a3b8 !important;
+}
+
+/* Buttons */
+.stButton > button {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 0.5rem 1rem !important;
+    font-weight: 600 !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25) !important;
+}
+.stButton > button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4) !important;
+}
+
+/* Chat Messages */
+.stChatMessage {
+    background: rgba(255, 255, 255, 0.02) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border-radius: 16px !important;
+    padding: 1rem !important;
+    backdrop-filter: blur(8px) !important;
+}
+
+/* Expanders */
+.streamlit-expanderHeader {
+    font-weight: 500 !important;
+    border-radius: 12px !important;
+}
+[data-testid="stExpander"] {
+    border-radius: 16px !important;
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    background: rgba(0,0,0,0.2) !important;
+}
+
+/* Hide standard header & footer */
+header {visibility: hidden;}
+footer {visibility: hidden;}
 </style>
 """
 
@@ -89,26 +189,47 @@ def retrieve_for_case(
     case: dict[str, Any],
     extra_messages: list[dict[str, str]],
 ) -> dict[str, Any]:
-    """BONUS TODO: run student retrieval for the loaded case.
-
-    Return a dict with keys:
-      - "merged_context": str  (StudentMemory.assemble_context output)
-      - "layers": dict[str, str]  (per-layer evidence: short_term/long_term/
-                                   episodic/semantic)
-      - "budget": dict  (the breakdown from assemble_context)
-
-    Hints:
-      * Build short_term from case["fixture_messages"] if present, else from
-        the matching user/thread messages in data/sessions.json, plus
-        extra_messages. E01 has no fixture — it uses thread minh-s1.
-      * Decide which durable layers to fetch from case["expected_layer"] (or
-        case["retrieve_layers"] for "mixed"), then call
-        memory.retrieve_long_term / retrieve_episodic / retrieve_semantic.
-      * Keep user_id and thread_id from the loaded case.
-      * Finish with memory.assemble_context(layers).
-    """
-    _ = (memory, case, extra_messages, settings, ShortTermMemory)
-    raise NotImplementedError("BONUS TODO: run student retrieval for the loaded case")
+    user_id = case.get("user_id", "")
+    thread_id = case.get("thread_id", "")
+    query = case.get("query", "")
+    expected_layer = case.get("expected_layer", "")
+    
+    stm = ShortTermMemory()
+    fixture = case.get("fixture_messages")
+    if fixture:
+        for msg in fixture:
+            stm.add(msg["role"], msg["content"])
+    else:
+        sessions_data = load_dataset()
+        for u in sessions_data.get("users", []):
+            if u["user_id"] == user_id:
+                for t in u.get("sessions", []):
+                    if t["thread_id"] == thread_id:
+                        for m in t.get("messages", []):
+                            stm.add(m["role"], m["content"])
+                        break
+                break
+    
+    for msg in extra_messages:
+        stm.add(msg["role"], msg["content"])
+        
+    layers = {"short_term": stm.render()}
+    
+    layers_to_fetch = case.get("retrieve_layers", [expected_layer])
+    if "long_term" in layers_to_fetch:
+        layers["long_term"] = memory.retrieve_long_term(user_id, thread_id, query)
+    if "episodic" in layers_to_fetch:
+        layers["episodic"] = memory.retrieve_episodic(user_id, query)
+    if "semantic" in layers_to_fetch:
+        layers["semantic"] = memory.retrieve_semantic(settings.semantic_graph_id, query)
+        
+    merged_context, budget = memory.assemble_context(layers)
+    
+    return {
+        "merged_context": merged_context,
+        "layers": layers,
+        "budget": budget,
+    }
 
 
 def main() -> None:
