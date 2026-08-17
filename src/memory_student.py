@@ -20,30 +20,25 @@ class StudentMemory:
     # `cap_query(query)` (see src/utils.py) before passing it to graph.search.
 
     def retrieve_long_term(self, user_id: str, thread_id: str, query: str) -> str:
-        # LAB TODO 1/4
-        # 1) prime_eval_thread(...) has already been provided as scaffolding.
-        # 2) call thread.get_user_context(thread_id=...)
-        # 3) return the .context string.
-        # Bonus: append graph.search(scope="edges", limit>=20) facts with
-        #        validity ranges (a low limit can miss deadline/open-loop facts).
         prime_eval_thread(self.client, user_id, thread_id, query)
         context = self.client.thread.get_user_context(thread_id=thread_id)
-        return context.context
+        
+        edges = self.client.graph.search(
+            user_id=user_id,
+            query=cap_query(query),
+            scope="edges",
+            limit=30,
+        )
+        return str(context.context) + "\n" + render_graph_search(edges)
 
     def retrieve_episodic(self, user_id: str, query: str) -> str:
-        # LAB TODO 2/4
-        # Use client.graph.search(user_id=..., query=cap_query(query),
-        #     scope="episodes", limit=...) then render_graph_search(...).
-        # Tip: verbose session episodes can crowd out concise, marker-bearing
-        # reflections under the tight episodic budget — render_graph_search
-        # accepts an `episode_char_cap` to keep more distinct episodes.
         results = self.client.graph.search(
             user_id=user_id,
             query=cap_query(query),
             scope="episodes",
-            limit=5,
+            limit=20,
         )
-        return render_graph_search(results)
+        return render_graph_search(results, episode_char_cap=300)
 
     def retrieve_semantic(self, graph_id: str, query: str) -> str:
         # LAB TODO 3/4
