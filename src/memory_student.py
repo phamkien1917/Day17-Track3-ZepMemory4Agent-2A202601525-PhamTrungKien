@@ -34,11 +34,21 @@ class StudentMemory:
     def retrieve_episodic(self, user_id: str, query: str) -> str:
         results = self.client.graph.search(
             user_id=user_id,
-            query=cap_query(query),
+            query=cap_query(query[-400:]),
             scope="episodes",
-            limit=20,
+            limit=50,
         )
-        return render_graph_search(results, episode_char_cap=300)
+        
+        class _WrappedResults:
+            def __init__(self, orig):
+                self.context = getattr(orig, "context", None)
+                self.edges = getattr(orig, "edges", None)
+                self.episodes = [ep for ep in (getattr(orig, "episodes", None) or []) if len(getattr(ep, "content", "")) < 300]
+                self.nodes = getattr(orig, "nodes", None)
+                self.observations = getattr(orig, "observations", None)
+                self.thread_summaries = getattr(orig, "thread_summaries", None)
+
+        return render_graph_search(_WrappedResults(results), episode_char_cap=170)
 
     def retrieve_semantic(self, graph_id: str, query: str) -> str:
         # LAB TODO 3/4
